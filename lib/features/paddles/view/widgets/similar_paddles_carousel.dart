@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../common/extensions/context_extensions.dart';
 import '../../../../common/widgets/buttons/app_icon_button.dart';
+import '../../domain/entities/paddle.dart';
 import '../../domain/value_objects/comparison_selection.dart';
 import '../providers/comparison_providers.dart';
 import 'hero_namespace.dart';
@@ -102,47 +105,68 @@ class _SimilarPaddlesCarouselState
             ),
             const SizedBox(height: AppSpacing.lg),
             SizedBox(
-              height: context.isCompact ? 430 : 460,
-              child: ListView.separated(
-                controller: _controller,
-                scrollDirection: Axis.horizontal,
-                itemCount: paddles.length,
-                separatorBuilder: (_, _) =>
-                    const SizedBox(width: AppSpacing.md),
-                itemBuilder: (context, index) {
-                  final paddle = paddles[index];
-                  final selected = widget.selection.contains(paddle.id);
-                  return SizedBox(
-                    width: cardWidth,
-                    child: PaddleCard(
-                      paddle: paddle,
-                      selected: selected,
-                      heroNamespace: HeroNamespace.similar,
-                      compact: true,
-                      onOpen: () {
-                        context.router.goPaddleDetail(
-                          paddle.id,
-                          selection: widget.selection,
-                          extra: const PaddleHeroExtra(
-                            namespace: HeroNamespace.similar,
-                          ),
-                        );
-                      },
-                      onToggleCompare: () {
-                        if (!selected && widget.selection.isFull) {
-                          widget.onLimitReached();
-                          return;
-                        }
-                        widget.onToggleCompare(paddle.id);
-                      },
-                    ),
-                  );
-                },
-              ),
+              height: (context.isCompact ? 430 : 460) + AppSpacing.lg * 2,
+              child: _carouselList(context, paddles, cardWidth),
             ),
           ],
         );
       },
+    );
+  }
+
+  Widget _carouselList(
+    BuildContext context,
+    List<Paddle> paddles,
+    double cardWidth,
+  ) {
+    final list = ListView.separated(
+      controller: _controller,
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+      itemCount: paddles.length,
+      separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.md),
+      itemBuilder: (context, index) {
+        final paddle = paddles[index];
+        final selected = widget.selection.contains(paddle.id);
+        return SizedBox(
+          width: cardWidth,
+          child: PaddleCard(
+            paddle: paddle,
+            selected: selected,
+            heroNamespace: HeroNamespace.similar,
+            compact: true,
+            onOpen: () {
+              context.router.goPaddleDetail(
+                paddle.id,
+                selection: widget.selection,
+                extra: const PaddleHeroExtra(
+                  namespace: HeroNamespace.similar,
+                ),
+              );
+            },
+            onToggleCompare: () {
+              if (!selected && widget.selection.isFull) {
+                widget.onLimitReached();
+                return;
+              }
+              widget.onToggleCompare(paddle.id);
+            },
+          ),
+        );
+      },
+    );
+
+    if (!kIsWeb || !context.isCompact) return list;
+
+    final behavior = ScrollConfiguration.of(context);
+    return ScrollConfiguration(
+      behavior: behavior.copyWith(
+        dragDevices: {
+          ...behavior.dragDevices,
+          PointerDeviceKind.mouse,
+        },
+      ),
+      child: list,
     );
   }
 }

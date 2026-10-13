@@ -111,15 +111,15 @@ class _ShellBottomChrome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasSelection = selection.isNotEmpty;
-    if (!hasSelection && !showFloatingNav) {
+    final showSelectionBar = selection.isNotEmpty && !compareSelected;
+    if (!showSelectionBar && !showFloatingNav) {
       return const SizedBox.shrink();
     }
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (hasSelection)
+        if (showSelectionBar)
           CompareSelectionBar(
             selection: selection,
             applyBottomSafeArea: !showFloatingNav,

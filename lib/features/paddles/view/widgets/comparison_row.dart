@@ -12,8 +12,9 @@ class ComparisonRow extends StatelessWidget {
     required this.highlightDifferences,
     required this.labelWidth,
     required this.columnWidth,
-    this.alternating = false,
     this.isHeader = false,
+    this.pinned = false,
+    this.onPinToggle,
   });
 
   final String label;
@@ -22,8 +23,9 @@ class ComparisonRow extends StatelessWidget {
   final bool highlightDifferences;
   final double labelWidth;
   final double columnWidth;
-  final bool alternating;
   final bool isHeader;
+  final bool pinned;
+  final VoidCallback? onPinToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -31,15 +33,18 @@ class ComparisonRow extends StatelessWidget {
     final highlight = highlightDifferences && differs;
     final background = highlight
         ? context.semanticColors.compareDifference
-        : alternating
-            ? colors.surfaceContainerHighest.withValues(alpha: 0.25)
-            : Colors.transparent;
+        : context.semanticColors.surfaceVariant;
 
     final style = isHeader
         ? Theme.of(context).textTheme.titleSmall
         : Theme.of(context).textTheme.bodyMedium;
 
-    return ColoredBox(
+    final labelStyle = style?.copyWith(
+      color: isHeader ? colors.onSurface : colors.onSurfaceVariant,
+      fontWeight: isHeader ? FontWeight.w700 : null,
+    );
+
+    final row = ColoredBox(
       color: background,
       child: IntrinsicHeight(
         child: Row(
@@ -54,15 +59,21 @@ class ComparisonRow extends StatelessWidget {
                 ),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Text(
-                    label,
-                    style: style?.copyWith(
-                      color: isHeader
-                          ? colors.onSurface
-                          : colors.onSurfaceVariant,
-                      fontWeight: isHeader ? FontWeight.w700 : null,
-                    ),
-                  ),
+                  child: onPinToggle == null
+                      ? Text(label, style: labelStyle)
+                      : Row(
+                          children: [
+                            Icon(
+                              pinned ? Icons.push_pin : Icons.push_pin_outlined,
+                              size: 18,
+                              color: pinned
+                                  ? colors.primary
+                                  : colors.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: AppSpacing.xs),
+                            Expanded(child: Text(label, style: labelStyle)),
+                          ],
+                        ),
                 ),
               ),
             ),
@@ -82,6 +93,17 @@ class ComparisonRow extends StatelessWidget {
               ),
           ],
         ),
+      ),
+    );
+
+    if (onPinToggle == null) return row;
+
+    return Semantics(
+      button: true,
+      label: pinned ? 'Unpin $label' : 'Pin $label',
+      child: InkWell(
+        onTap: onPinToggle,
+        child: ExcludeSemantics(child: row),
       ),
     );
   }

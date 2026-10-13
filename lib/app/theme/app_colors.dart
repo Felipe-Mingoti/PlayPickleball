@@ -21,7 +21,7 @@ abstract final class AppColors {
   static const Color lightError = Color(0xFFB3261E);
 
   static const Color lightCompareAdded = Color(0xFF6B46E6);
-  static const Color lightCompareDifference = Color(0x1F9772EB);
+  static const Color lightCompareDifference = Color(0xFFD9CCFB);
   static const Color lightPriceBadge = Color(0xFFF0EEFB);
   static const Color lightSpecHighlight = Color(0x149772EB);
   static const Color lightFilterSelected = Color(0xFFECE5FF);

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_spacing.dart';
-import '../../../../common/extensions/context_extensions.dart';
 import '../../../../common/widgets/buttons/app_button.dart';
 import '../../../../common/widgets/cards/app_card.dart';
 import '../../../../core/utils/formatters.dart';
@@ -30,15 +29,14 @@ class PaddleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
-    final subtleGlow = context.isCompact;
 
     return Stack(
       fit: StackFit.expand,
       clipBehavior: Clip.none,
       children: [
-        _PaddleLedGlow(subtle: subtleGlow),
+        const _PaddleLedGlow(),
         Padding(
-          padding: EdgeInsets.all(subtleGlow ? 3 : AppSpacing.xs),
+          padding: const EdgeInsets.all(3),
           child: AppCard(
             selected: selected,
             onTap: onOpen,
@@ -52,7 +50,20 @@ class PaddleCard extends StatelessWidget {
                     heroNamespace: heroNamespace,
                   ),
                 ),
-                const SizedBox(height: AppSpacing.md),
+                SizedBox(
+                  width: double.infinity,
+                  height: AppSpacing.md,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 5.5),
+                    child: ColoredBox(
+                      color: colors.primary.withValues(
+                        alpha: Theme.of(context).brightness == Brightness.dark
+                            ? 0.35
+                            : 0.22,
+                      ),
+                    ),
+                  ),
+                ),
                 Text(
                   paddle.brand,
                   style: textTheme.labelMedium?.copyWith(
@@ -102,41 +113,29 @@ class PaddleCard extends StatelessWidget {
 }
 
 class _PaddleLedGlow extends StatelessWidget {
-  const _PaddleLedGlow({required this.subtle});
-
-  final bool subtle;
+  const _PaddleLedGlow();
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final glow = Theme.of(context).colorScheme.primary;
-    final halo = glow.withValues(
-      alpha: subtle ? (isDark ? 0.42 : 0.22) : (isDark ? 0.7 : 0.38),
-    );
+    final halo = glow.withValues(alpha: isDark ? 0.75 : 0.55);
 
     return IgnorePointer(
       child: DecoratedBox(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(subtle ? 18 : 20),
+          borderRadius: BorderRadius.circular(18),
           gradient: RadialGradient(
             center: const Alignment(0, -0.2),
-            radius: subtle ? 0.72 : 1.05,
+            radius: 0.72,
             colors: [
-              glow.withValues(
-                alpha: subtle ? (isDark ? 0.55 : 0.4) : (isDark ? 0.95 : 0.72),
-              ),
+              glow.withValues(alpha: isDark ? 0.92 : 0.82),
               halo,
               glow.withValues(alpha: 0),
             ],
-            stops: subtle ? const [0, 0.45, 1] : const [0, 0.62, 1],
+            stops: const [0, 0.45, 1],
           ),
-          boxShadow: [
-            BoxShadow(
-              color: halo,
-              blurRadius: subtle ? 10 : 18,
-              spreadRadius: subtle ? 0 : 1,
-            ),
-          ],
+          boxShadow: [BoxShadow(color: halo, blurRadius: 10)],
         ),
       ),
     );

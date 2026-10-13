@@ -18,6 +18,7 @@ import '../providers/comparison_providers.dart';
 import '../providers/paddle_providers.dart';
 import '../widgets/hero_namespace.dart';
 import '../widgets/paddle_hero_image.dart';
+import '../widgets/paddle_image_viewer.dart';
 import '../widgets/paddle_specs.dart';
 import '../widgets/similar_paddles_carousel.dart';
 
@@ -94,11 +95,30 @@ class PaddleDetailScreen extends ConsumerWidget {
 
         final selected = selection.contains(match.id);
 
+        final photoPath = match.imagePath;
+
         return DetailPageLayout(
-          image: PaddleHeroImage(
-            paddle: match,
-            heroNamespace: heroNamespace,
-          ),
+          image: photoPath == null
+              ? PaddleHeroImage(
+                  paddle: match,
+                  heroNamespace: heroNamespace,
+                )
+              : MergeSemantics(
+                  child: Semantics(
+                    button: true,
+                    label: 'View larger photo',
+                    onTap: () => showPaddleImageViewer(context, photoPath),
+                    child: GestureDetector(
+                      onTap: () => showPaddleImageViewer(context, photoPath),
+                      child: ExcludeSemantics(
+                        child: PaddleHeroImage(
+                          paddle: match,
+                          heroNamespace: heroNamespace,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
           summary: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

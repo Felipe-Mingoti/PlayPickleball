@@ -166,7 +166,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                     crossAxisSpacing: AppSpacing.lg,
                     mainAxisSpacing: AppSpacing.lg,
                     // Slightly taller than wide so image + meta + compare action fit.
-                    childAspectRatio: columns == 1 ? 0.72 : 0.64,
+                    childAspectRatio: columns == 1 ? 0.58 : 0.64,
                   ),
                   delegate: SliverChildBuilderDelegate((context, index) {
                     final paddle = paddles[index];

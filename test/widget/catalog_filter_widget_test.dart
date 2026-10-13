@@ -133,7 +133,7 @@ void main() {
     final sort = tester.getRect(find.text('Sort: Name'));
     expect(sort.left, greaterThan(shape.right));
     expect((sort.center.dy - shape.center.dy).abs(), lessThan(24));
-    expect(ledBlur(tester), 18);
+    expect(ledBlur(tester), 10);
     expectUnfilteredCatalog();
 
     await tester.tap(find.text('Shape'));
@@ -152,5 +152,33 @@ void main() {
     expect(find.text('Shape · Elongated'), findsNothing);
     expect(find.text('Shape'), findsWidgets);
     expectUnfilteredCatalog();
+  });
+
+  int catalogCrossAxisCount(WidgetTester tester) {
+    final grid = tester.widget<SliverGrid>(find.byType(SliverGrid));
+    final delegate =
+        grid.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
+    return delegate.crossAxisCount;
+  }
+
+  testWidgets('catalog uses four columns from 1200px and three below that', (
+    tester,
+  ) async {
+    await pumpCatalog(tester, size: const Size(1000, 1600));
+    expect(catalogCrossAxisCount(tester), 3);
+
+    await pumpCatalog(tester, size: const Size(1200, 1600));
+    expect(catalogCrossAxisCount(tester), 4);
+  });
+
+  testWidgets('small phone catalog does not overflow', (tester) async {
+    await pumpCatalog(tester, size: const Size(320, 568));
+    expect(tester.takeException(), isNull);
+    expect(find.text('Paddle catalog'), findsOneWidget);
+    final grid = tester.widget<SliverGrid>(find.byType(SliverGrid));
+    final delegate =
+        grid.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
+    expect(delegate.crossAxisCount, 1);
+    expect(delegate.childAspectRatio, 0.58);
   });
 }

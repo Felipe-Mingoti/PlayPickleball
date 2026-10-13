@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 abstract final class ResponsiveBreakpoints {
   static const double medium = 600;
   static const double expanded = 900;
+  static const double large = 1200;
 }
 
 enum AppBreakpoint { compact, medium, expanded }
@@ -31,6 +32,8 @@ class ResponsiveLayout extends StatelessWidget {
   }
 
   static int catalogColumns(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    if (width >= ResponsiveBreakpoints.large) return 4;
     return switch (breakpointOf(context)) {
       AppBreakpoint.compact => 1,
       AppBreakpoint.medium => 2,

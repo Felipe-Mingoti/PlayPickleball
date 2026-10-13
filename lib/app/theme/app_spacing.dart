@@ -9,6 +9,6 @@ abstract final class AppSpacing {
   static const double xxxl = 48;
 
   static const double contentMaxWidth = 1120;
-  static const double compareLabelColumnWidth = 104;
+  static const double compareLabelColumnWidth = 148;
   static const double minTouchTarget = 44;
 }
